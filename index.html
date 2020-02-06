@@ -16,10 +16,9 @@
    <meta property="og:description" content="請問還有口罩嗎？">
    <meta property="og:locale" content="zh_tw">
    <meta property="og:type" content="website">
-   <meta property="og:url" content="">
-   <meta property="og:image" content="">
-   <meta property="og:site_name" content="Site Name, i.e. Moz" />
-   <meta property="fb:admins" content="Facebook numberic ID" />
+   <meta property="og:url" content="https://feitoengineer19.github.io/mask-map/">
+   <meta property="og:image" content="https://g0vhackmd.blob.core.windows.net/g0v-hackmd-images/upload_d66720899e86826c9ae2e999dbec76fe">
+   <meta property="og:site_name" content="全台各地藥局口罩存貨實時地圖" />
    
    <link rel="shortcut icon" href="./Assets/mask.png"/>
    
@@ -41,9 +40,31 @@
 </head>
 <body>
   <div class="container py-3 h-100">
-    <h1>全台各地藥局口罩存貨實時地圖</h1>
+    <h1 class="mb-2">全台各地藥局口罩存貨實時地圖</h1>
     <div id="map"></div>
-    <p>綠色點表示成人口罩存貨 > 100；橘色點表示成人口罩存貨 <= 100；紅色點表示成人口罩存貨 < 30。</p>
+    <div class="info d-flex justify-content-between mt-2">
+      <p>綠色點表示成人口罩存貨 > 100；橘色點表示成人口罩存貨 <= 100；紅色點表示成人口罩存貨 < 30。</p>
+      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
+        購買規則
+      </button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">購買規則</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body text-center">
+            <img src="https://g0vhackmd.blob.core.windows.net/g0v-hackmd-images/upload_d66720899e86826c9ae2e999dbec76fe" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Bootstrap JS -->

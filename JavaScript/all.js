@@ -1,5 +1,5 @@
 // 建立 Leaflet 地圖，並設定經緯度座標，縮放程度為 6。
-const map = L.map('map').setView(new L.LatLng(23.628008, 121.097567), 8);
+const map = L.map('map').setView(new L.LatLng(25.040065, 121.523235), 10);
 
 // 設定地圖資料來源（OpenStreetMap）。
 const osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
