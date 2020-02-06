@@ -1,0 +1,111 @@
+// Mixin Mangement --------------------------------------
+@mixin flex($f-d:row,$j-c:center,$a-i:center){
+  display: flex ;
+  flex-direction: $f-d ;
+  justify-content: $j-c ;
+  align-items: $a-i ;
+}
+
+@mixin pos-a($l:50%,$t:$l){
+  position: absolute ;
+  top: $t ;
+  left: $l ;
+}
+
+@mixin font($f-z: 1rem,$f-c:$main-color,$f-w:normal){
+  font-size: $f-z ;
+  color: $f-c ;
+  font-weight: $f-w ;
+}
+
+// 元素寬高
+@mixin size($w,$h:$w){
+  width: $w;
+  height: $h;
+}
+
+// flex 容器設定(預設置中)
+@mixin flex-center($jc:center, $ai:center){
+  display: flex;
+  justify-content: $jc;
+  align-items: $ai;
+}
+
+// 絕對定位(預設置中)
+@mixin pos-a($l:50%, $t:50%){
+  position: absolute;
+  left: $l;
+  top: $t;
+}
+
+@mixin btn{
+  padding: 0px ;
+  border: none ;
+  border-radius: 3px;
+  color: #fff ;
+  background: rgba(0,0,0,0.35);
+  transition: all .5s ;
+
+  &:hover{
+    cursor: pointer ;
+    background-color: $secondaryColor ;
+  }
+}
+
+@mixin userSelectForbidden{
+  // 禁止使用者選取（反白）
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                        supported by Chrome and Opera */
+}
+
+// Styling Class Management --------------------------------------
+.bg-cover{
+  background-position: center;
+  background-size: cover;
+}
+
+.negative-row-margin{
+  margin: 0px -15px;
+}
+
+// 使絕對定位元素撐滿父元素
+.pos-a-full-size{
+  position: absolute;
+  left: 0px; right: 0px;
+  top: 0px; bottom: 0px;
+}
+
+// Fade Animation 
+.fade-left-item, 
+.fade-right-item,
+.fade-top-item,
+.fade-bottom-item {
+  transform: translateX(0px);
+  opacity: 1;
+  transition: all 1s;
+}
+
+.fade-in-left {
+  transform: translateX(-100px);
+  opacity: 0;
+}
+
+.fade-in-right {
+  transform: translateX(100px);
+  opacity: 0;
+}
+
+.fade-in-top {
+  transform: translateY(-100px);
+  opacity: 0;
+}
+
+.fade-in-bottom {
+  transform: translateY(100px);
+  opacity: 0;
+}

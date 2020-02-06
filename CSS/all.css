@@ -1,0 +1,33 @@
+*, *::before, *::after {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: "Microsoft JhengHei","Segoe UI","Roboto","Helvetica Neue", Arial, sans-serif,"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+html, body {
+  width: 100%;
+  height: 100vh;
+}
+
+body {
+  background-color: #eee;
+}
+
+h1 {
+  font-weight: bold;
+  margin-bottom: 0;
+  padding: 5px 0px;
+}
+
+p {
+  padding: 5px 0px;
+  margin-bottom: 0;
+}
+
+#map {
+  width: 100%;
+  height: 80vh;
+}
+/*# sourceMappingURL=all.css.map */
