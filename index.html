@@ -28,9 +28,10 @@
    <!-- Bootstrap -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-  <!-- Leaflet.css and js -->
+  <!-- Leaflet.css -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css">
 
   <!-- Font Awesome -->
   <script src="https://kit.fontawesome.com/fcea51171e.js" crossorigin="anonymous"></script>
@@ -39,38 +40,75 @@
   <link rel="stylesheet" href="CSS/all.css">
 </head>
 <body>
-  <div class="container py-3 h-100">
+  <aside class="board">
+    <div class="board-head pb-3">
+      <div class="p-3 d-flex justify-content-between">
+        <h1 class="mb-0 h2 font-weight-bold">口罩存貨實時地圖</h1>
+        <div id="close-board-btn" class="d-block d-sm-none"><i class="fas fa-caret-right"></i></div>
+      </div>
+      <div class="form-row px-3">
+        <div class="form-group col-6">
+          <select id="city" class="form-control">
+            <option value="" selected disabled>請選擇縣市</option>
+          </select>
+        </div>
+        <div class="form-group col-6">
+          <select id="area" class="form-control">
+            <option value="" selected disabled>請選擇鄉鎮市區</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group px-3">
+        <input type="text" id="searchValue" class="form-control" placeholder="透過地址或名稱搜尋" aria-label="透過地址或名稱搜尋" aria-describedby="searchBtn">
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="button" id="searchBtn">搜尋</button>
+        </div>
+      </div>
+      <div id="store-total" class="px-3 mt-3">載入中...</div>
+    </div>
+    <div id="store-list" class="p-3">
+    </div>
+    <div id="open-board-btn" class="d-block d-sm-none"><i class="fas fa-caret-left"></i></div>
+  </aside>
+  <main id="map"></main>
+
+  <!-- <div class="container py-3 h-100">
     <h1 class="mb-2">全台各地藥局口罩存貨實時地圖</h1>
-    <div id="map"></div>
     <div class="info d-flex justify-content-between mt-2">
       <p>綠色點表示成人口罩存貨 > 100；橘色點表示成人口罩存貨 <= 100；紅色點表示成人口罩存貨 < 30。</p>
       <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
         購買規則
       </button>
     </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">購買規則</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body text-center">
-            <img src="https://g0vhackmd.blob.core.windows.net/g0v-hackmd-images/upload_d66720899e86826c9ae2e999dbec76fe" alt="">
-          </div>
+  </div> -->
+  <!-- Modal -->
+  <!-- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">購買規則</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body text-center">
+          <img src="https://g0vhackmd.blob.core.windows.net/g0v-hackmd-images/upload_d66720899e86826c9ae2e999dbec76fe" alt="">
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
+  <!-- Leaflet.js -->
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
+  
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.4.1.js"  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="  crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  
+  <!-- jQuery LoadingOverlay -->
+  <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.6/dist/loadingoverlay.min.js"></script>
 
   <!-- Custom JS -->
   <script src="JavaScript/all.js"></script>

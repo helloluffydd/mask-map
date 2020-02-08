@@ -1,36 +1,193 @@
-// Global
-*,*::before,*::after{
-  box-sizing: border-box ;
-  padding: 0 ; margin: 0 ;
-  font-family: "Microsoft JhengHei","Segoe UI","Roboto","Helvetica Neue", Arial, sans-serif,"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" ;
+// Mixin
+@mixin size($w, $h:$w) {
+  width: $w;
+  height: $h;
 }
 
-html, body{
+// Global 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
   width: 100%;
   height: 100vh;
+  font-family: "Microsoft JhengHei", "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
 body {
   background-color: #eee;
+  position: relative;
 }
 
-h1 {
-  font-weight: bold;
-  margin-bottom: 0;
-  padding: 5px 0px;
+.board {
+  @include size(27%, 100%);
+  max-height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  background-color: #fff;
+  overflow: hidden;
+  box-shadow: 0px 0px 20px rgba(#000, 0.4);
+  transition: all .5s;
+
+  @media (max-width: 575.98px) { 
+    @include size(100%, 100%);
+  }
+
+  &.hide {
+    transform: translateX(-100%);
+    max-height: 100vh;
+    overflow: visible;
+  }
+
+  .board-head {
+    background-color: rgb(255, 250, 219);
+  }
+
+  input, select {
+    outline: none;
+  }
 }
 
-p {
-  padding: 5px 0px;
-  margin-bottom: 0;
+#close-board-btn {
+  color: #333;
+  font-size: 28px;
+  cursor: pointer;
+
+  @keyframes move {
+    0% {
+      transform: translateX(0px);
+    }
+    100%{
+      transform: translateX(-10px);      
+    }
+  }
+
+  animation: move .5s alternate infinite;
 }
 
-img {
-  max-width: 80%;
+#open-board-btn {
+  position: absolute;
+  top: 45%;
+  left: 100%;
+  z-index: 10;
+  padding: 2px 8px 2px 5px;
+  border-radius: 0px 2px 2px 0px;
+  background-color: #fff;
+  box-shadow: 10px 0px 10px rgba(#000, 0.2);
+  color: #333;
+  font-size: 24px;
+  cursor: pointer;
 }
 
+#store-list {
+  max-height: 550px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  background-color: #fff;
+}
+
+
+.store-info {
+  color: #555;
+  font-size: 14px;
+
+  h5 {
+    color: #000;
+  }
+
+  .masks-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .mask-item {
+    width: 50%;
+    text-align: center;
+    color: #000;
+    font-weight: bold;
+    border: 1px solid #333;
+    border-radius: 5px;
+    padding: 3px 10px;
+    margin-right: 10px;
+    background-color: rgb(218, 218, 218);
+  }
+  
+  span {
+    font-size: 18px;
+  }
+}
 
 #map {
-  width: 100%;
-  height: 80vh;
+  @include size(100%, 100vh);
+  position: relative;
+  z-index: 1;
+
+  .leaflet-overlay-pane {
+    filter: saturate(1.5); // 藥局圓圈的飽和度
+  }
+  .leaflet-tile-pane {
+    filter: grayscale(0.7) contrast(0.5) brightness(0.7); // OSM 圖資的對比與亮度
+  }
+  
+  .store-cluster {
+    @include size(50px);
+    border-radius: 50%;
+    line-height: 50px;
+    font-size: 14px;
+    text-align: center;
+    font-weight: bold;
+    border: 1.5px solid rgba(#000, 0.7);
+    background-color: rgba(#fff, 0.5);
+  }
+  
+  .leaflet-div-icon {
+    background-color: transparent;
+  }
+
+  .leaflet-popup-content-wrapper{
+    font-family: "Microsoft JhengHei", "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    border: 1px solid #000;
+    border-bottom: none;
+
+    h6 {
+      margin-bottom: 5px;
+    }
+
+    p {
+      margin: 0px 0px 2px 0px;
+    }
+
+    span {
+      font-size: 18px;
+    }
+  }
+}
+
+// customed scrollbar in WebKit
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
 }
