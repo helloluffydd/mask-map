@@ -27,7 +27,7 @@ body {
   top: 0;
   left: 0;
   z-index: 5;
-  background-color: #fff;
+  background-color: transparent;
   overflow: hidden;
   -webkit-box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.4);
           box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.4);
@@ -50,11 +50,82 @@ body {
 }
 
 .board .board-head {
-  background-color: #fffadb;
+  background-color: rgba(230, 252, 255, 0.7);
 }
 
 .board input, .board select {
   outline: none;
+}
+
+#store-list {
+  height: 700px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+#store-list .store-info {
+  color: #555;
+  font-size: 14px;
+}
+
+#store-list .store-info h5 {
+  color: #000;
+}
+
+#store-list .store-info .masks-info {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+#store-list .store-info .mask-item {
+  width: 50%;
+  text-align: center;
+  color: #000;
+  font-weight: bold;
+  border: 1px solid #333;
+  border-radius: 5px;
+  padding: 3px 10px;
+  margin-right: 10px;
+  background-color: #dadada;
+}
+
+#store-list .store-info span {
+  font-size: 18px;
+}
+
+#detail-info {
+  color: #007BFF;
+  cursor: pointer;
+  -webkit-transition: all .5s;
+  transition: all .5s;
+}
+
+#detail-info:hover {
+  -webkit-transform: scale(1.2);
+          transform: scale(1.2);
+}
+
+#infoModal .modal-body {
+  max-height: 80vh;
+  overflow: scroll;
+}
+
+#infoModal ul {
+  list-style: none inside;
+}
+
+#infoModal img {
+  width: 75%;
+  display: block;
+  margin: auto;
 }
 
 #close-board-btn {
@@ -100,50 +171,6 @@ body {
   color: #333;
   font-size: 24px;
   cursor: pointer;
-}
-
-#store-list {
-  max-height: 550px;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  background-color: #fff;
-}
-
-.store-info {
-  color: #555;
-  font-size: 14px;
-}
-
-.store-info h5 {
-  color: #000;
-}
-
-.store-info .masks-info {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-}
-
-.store-info .mask-item {
-  width: 50%;
-  text-align: center;
-  color: #000;
-  font-weight: bold;
-  border: 1px solid #333;
-  border-radius: 5px;
-  padding: 3px 10px;
-  margin-right: 10px;
-  background-color: #dadada;
-}
-
-.store-info span {
-  font-size: 18px;
 }
 
 #map {

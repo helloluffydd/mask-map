@@ -13,7 +13,7 @@ const map = L.map('map', {
 // 設定地圖資料來源（OpenStreetMap）。
 const osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 L.tileLayer(osmUrl, {
-  attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors | 資料來源：<a href="https://data.nhi.gov.tw/Datasets/DatasetResource.aspx?rId=A21030000I-D50001-001&fbclid=IwAR11LdkhQPr1nyASKg0bUCx6LnIGY7KECOeVQ2EHwc67f2iKocIMuXRIpFE">衛生福利部中央健康保險署</a>',
+  attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> | 資料來源：<a href="https://data.nhi.gov.tw/Datasets/DatasetResource.aspx?rId=A21030000I-D50001-001&fbclid=IwAR11LdkhQPr1nyASKg0bUCx6LnIGY7KECOeVQ2EHwc67f2iKocIMuXRIpFE">衛生福利部中央健康保險署</a> | Created by <a href="https://www.facebook.com/luffychen0715?ref=bookmarks" target="_blank">Luffy</a>',
   minZoom: 8,
   maxZoom: 18
 }).addTo(map);
@@ -48,15 +48,6 @@ const storeCluster = new L.MarkerClusterGroup({
 	}
 }).addTo(map);
 
-// 監聽資訊面板開闔按鈕。
-document.getElementById('close-board-btn').addEventListener('click', function() {
-  document.querySelector('.board').classList.add('hide');
-})
-
-document.getElementById('open-board-btn').addEventListener('click', function() {
-  document.querySelector('.board').classList.remove('hide');
-})
-
 // 串接 API，（非同步）獲取遠端 API 或本地 JSON 資料（封裝成一個 function）。
 function getXML(path) {
   // 利用 Promise 確保獲取資料完成。
@@ -74,6 +65,7 @@ function getXML(path) {
     xhrReq.send();
   })
 }
+
 const getCityDatas = getXML('./CityCountyData.json');
 const getStoreDatas = getXML('https://raw.githubusercontent.com/kiang/pharmacies/master/json/points.json?fbclid=IwAR0RC0E5_D-1vZVHJX_wvm7VUvdHYYcGw2Q0sSk4ppxu1zvqh7hAWN0oHdU');
 
@@ -89,10 +81,14 @@ Promise.all([getCityDatas, getStoreDatas]).then(resultDatas => {
   // 印出所有藥局口罩庫存資訊（預設）。
   showAllStore(storeDatas);
 
+  $.LoadingOverlay("hide");
+
   // 在地圖上繪製所有藥局資訊。
   drawAllStore(storeDatas);
 
-  $.LoadingOverlay("hide");
+  // 取得今日時間與購買口罩者
+  getToday();
+
 
   document.getElementById('city').addEventListener('change', function() {
     const citySelected = document.getElementById('city').value;
@@ -120,15 +116,24 @@ Promise.all([getCityDatas, getStoreDatas]).then(resultDatas => {
     document.getElementById('store-total').innerHTML = `總共找到</u> ${storeCount} 家相符的藥局。`;
     document.getElementById('store-list').innerHTML = str;
   })
+
+  // 監聽資訊面板開闔按鈕。
+  document.getElementById('close-board-btn').addEventListener('click', function() {
+    document.querySelector('.board').classList.add('hide');
+  })
+
+  document.getElementById('open-board-btn').addEventListener('click', function() {
+    document.querySelector('.board').classList.remove('hide');
+  })
 })
 
-// 刪除陣列中的特定數值或字串。
-function removeByValue(array, value) {
-  return array.forEach((item, index) => {
-    if(item === value) {
-      array.splice(index, 1);
-    }
-  })
+// 取得今日日期
+function getToday() {
+  let today = new Date();
+  const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+  let todayStr = `今天是 <span class="font-weight-bold">${today.getFullYear()} 年 ${today.getMonth() + 1} 月 ${today.getDate()} 日 ${days.find((day, index) => index === today.getDay())} </span><br> 
+  <i id="detail-info" class="fas fa-info-circle h6" data-toggle="modal" data-target="#infoModal"></i> 身分證尾數為 <span class="text-primary font-weight-bold h5">${today.getDay() % 2 === 1 ? '單數' : '雙數'}</span> 者可以購買口罩`;
+  document.getElementById('date').innerHTML = todayStr;
 }
 
 // 產生城市搜尋欄位裡的選項。
@@ -165,7 +170,7 @@ function createAreaOption(cityData, citySelected) {
 
 // 產生藥局資訊的 HTML 樣板。
 function createHTML(store, html, count) {
-  let bgAdultColor, bgChildColor = '#bfffbf'; 
+  let [bgAdultColor, bgChildColor] = ['#bfffbf', '#bfffbf']; // 綠  
   if(store.properties.mask_adult <= 100) bgAdultColor = '#ffa470'; // 橙
   if(store.properties.mask_adult <= 30) bgAdultColor = '#ff9696'; // 紅
   if(store.properties.mask_child <= 100) bgChildColor = '#ffa470';
@@ -252,8 +257,16 @@ function drawAllStore(datas) {
     <p class="font-weight-bold"><span>成人：  ${store.properties.mask_adult} 個</span>／兒童：${store.properties.mask_child} 個</p>
     `);
 
-
     storeCluster.addLayer(storeLocation);
   })
   map.addLayer(storeCluster);
+}
+
+// 刪除陣列中的特定數值或字串。
+function removeByValue(array, value) {
+  return array.forEach((item, index) => {
+    if(item === value) {
+      array.splice(index, 1);
+    }
+  })
 }

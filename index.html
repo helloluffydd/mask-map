@@ -42,61 +42,74 @@
 <body>
   <aside class="board">
     <div class="board-head pb-3">
-      <div class="p-3 d-flex justify-content-between">
+      <div class="px-3 pt-3 mb-2 d-flex justify-content-between">
         <h1 class="mb-0 h2 font-weight-bold">口罩存貨實時地圖</h1>
         <div id="close-board-btn" class="d-block d-sm-none"><i class="fas fa-caret-right"></i></div>
       </div>
+      <div id="date" class="px-3 mb-2"></div>
       <div class="form-row px-3">
         <div class="form-group col-6">
-          <select id="city" class="form-control">
+          <select id="city" class="custom-select custom-select-sm">
             <option value="" selected disabled>請選擇縣市</option>
           </select>
         </div>
         <div class="form-group col-6">
-          <select id="area" class="form-control">
+          <select id="area" class="custom-select custom-select-sm">
             <option value="" selected disabled>請選擇鄉鎮市區</option>
           </select>
         </div>
       </div>
-      <div class="input-group px-3">
+      <div class="input-group input-group-sm px-3">
         <input type="text" id="searchValue" class="form-control" placeholder="透過地址或名稱搜尋" aria-label="透過地址或名稱搜尋" aria-describedby="searchBtn">
         <div class="input-group-append">
           <button class="btn btn-primary" type="button" id="searchBtn">搜尋</button>
         </div>
       </div>
-      <div id="store-total" class="px-3 mt-3">載入中...</div>
+      <div id="store-total" class="px-3 mt-2">載入中...</div>
     </div>
-    <div id="store-list" class="p-3">
-    </div>
+    <div id="store-list" class="p-3"></div>
     <div id="open-board-btn" class="d-block d-sm-none"><i class="fas fa-caret-left"></i></div>
   </aside>
   <main id="map"></main>
 
-  <!-- <div class="container py-3 h-100">
-    <h1 class="mb-2">全台各地藥局口罩存貨實時地圖</h1>
-    <div class="info d-flex justify-content-between mt-2">
-      <p>綠色點表示成人口罩存貨 > 100；橘色點表示成人口罩存貨 <= 100；紅色點表示成人口罩存貨 < 30。</p>
-      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
-        購買規則
-      </button>
-    </div>
-  </div> -->
-  <!-- Modal -->
-  <!-- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">購買規則</h5>
+          <h5 class="modal-title text-primary" id="infoModalLabel">詳細資訊</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body text-center">
-          <img src="https://g0vhackmd.blob.core.windows.net/g0v-hackmd-images/upload_d66720899e86826c9ae2e999dbec76fe" alt="">
+        <div class="modal-body">
+          <ul>
+            <li>
+              <div class="d-flex justify-between">
+                <p class="mb-1 mr-2"><i class="fas fa-info-circle"></i></p>
+                <p class="mb-1">部分藥局因採發放號碼牌方式，方便民眾購買口罩，系統目前無法顯示已發送號碼牌數量。</p>
+              </div>
+            </li>
+            <li>
+              <div class="d-flex justify-between">
+                <p class="mb-1 mr-2"><i class="fas fa-info-circle"></i></p>
+                <p class="mb-1">口罩數量以藥局實際存量為主，線上查詢之數量<span class="text-danger">僅供參考</span>。</p>
+              </div>
+            </li>
+            <li>
+              <div class="d-flex justify-between">
+                <p class="mb-1 mr-2"><i class="fas fa-info-circle"></i></p>
+                <p class="mb-1">若您的藥局有需要加註的公告事項，可以填寫<a href="https://pse.is/KH7DC" target="_blank">表單</a>。</p>
+              </div>
+            </li>
+          </ul>
+          <hr>
+          <div>
+            <img src="https://g0vhackmd.blob.core.windows.net/g0v-hackmd-images/upload_d66720899e86826c9ae2e999dbec76fe" alt="">
+          </div>
         </div>
       </div>
     </div>
-  </div> -->
+  </div>
 
   <!-- Leaflet.js -->
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
