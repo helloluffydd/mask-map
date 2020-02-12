@@ -11,21 +11,19 @@
   <meta name="description" content="請問還有口罩嗎？">
   <meta name="keywords" content="台灣, 口罩, 藥局, 存貨, 武漢肺炎, 冠狀病毒">
 
-   <!-- Facebook -->
-   <meta property="og:title" content="全台各地藥局口罩存貨實時地圖">
-   <meta property="og:description" content="請問還有口罩嗎？">
-   <meta property="og:locale" content="zh_tw">
-   <meta property="og:type" content="website">
-   <meta property="og:url" content="https://feitoengineer19.github.io/mask-map/">
-   <meta property="og:image" content="https://i.imgur.com/ZlnbWmL.jpg">
-   <meta property="og:site_name" content="全台各地藥局口罩存貨實時地圖" />
-   
-   <link rel="shortcut icon" href="./Assets/mask.png"/>
-   
-   <!-- Favicon -->
-   <link rel="icon" href="./images/favicon_48.ico">
- 
-   <!-- Bootstrap -->
+  <!-- Facebook -->
+  <meta property="og:title" content="全台口罩存貨實時地圖">
+  <meta property="og:description" content="請問還有口罩嗎？">
+  <meta property="og:locale" content="zh_tw">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://feitoengineer19.github.io/mask-map/">
+  <meta property="og:image" content="https://i.imgur.com/ZlnbWmL.jpg">
+  <meta property="og:site_name" content="全台各地藥局口罩存貨實時地圖" />
+    
+  <!-- Favicon -->
+  <link rel="icon" href="./Assets/mask.PNG">
+
+  <!-- Bootstrap -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
   <!-- Leaflet.css -->
@@ -40,10 +38,10 @@
   <link rel="stylesheet" href="CSS/all.css">
 </head>
 <body>
-  <aside class="board">
+  <aside class="board d-flex flex-column">
     <div class="board-head pb-3">
       <div class="px-3 pt-3 mb-2 d-flex justify-content-between">
-        <h1 class="mb-0 h2 font-weight-bold">口罩存貨實時地圖</h1>
+        <h1 class="mb-0 h3 font-weight-bold">口罩存貨實時地圖</h1>
         <div id="close-board-btn" class="d-block d-sm-none"><i class="fas fa-caret-right"></i></div>
       </div>
       <div id="date" class="px-3 mb-2"></div>
@@ -67,7 +65,7 @@
       </div>
       <div id="store-total" class="px-3 mt-2">載入中...</div>
     </div>
-    <div id="store-list" class="p-3"></div>
+    <div id="store-list"></div>
     <div id="open-board-btn" class="d-block d-sm-none"><i class="fas fa-caret-left"></i></div>
   </aside>
   <main id="map"></main>
@@ -76,7 +74,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title text-primary" id="infoModalLabel">詳細資訊</h5>
+          <h5 class="modal-title font-weight-bold" id="infoModalLabel">詳細資訊</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>

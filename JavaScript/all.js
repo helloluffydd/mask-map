@@ -24,9 +24,9 @@ L.control.zoom({
 }).addTo(map);
 
 // 自訂藥局座標 Icon。
-function createLocationIcon(color) {
+function createIcon(name) {
   return new L.Icon({
-  iconUrl: `./Assets/flag-${color}.png`,
+  iconUrl: `./Assets/${name}.png`,
     // shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
     iconSize: [41, 41],
     iconAnchor: [12, 41],
@@ -34,9 +34,11 @@ function createLocationIcon(color) {
     shadowSize: [41, 41]
   });
 }
-const greenIcon = createLocationIcon('green');
-const orangeIcon = createLocationIcon('orange');
-const redIcon = createLocationIcon('red');
+
+const greenIcon = createIcon('flag-green');
+const orangeIcon = createIcon('flag-orange');
+const redIcon = createIcon('flag-red');
+const userPosIcon = createIcon('user');
 
 // 區域藥局群集。
 const storeCluster = new L.MarkerClusterGroup({
@@ -47,6 +49,9 @@ const storeCluster = new L.MarkerClusterGroup({
 		return L.divIcon({ html: `<div class="store-cluster">${cluster.getChildCount()}</div>` });
 	}
 }).addTo(map);
+
+// 獲取收藏的藥局清單。
+const lovedStores = JSON.parse(localStorage.getItem('lovedStores')) || [];
 
 // 串接 API，（非同步）獲取遠端 API 或本地 JSON 資料（封裝成一個 function）。
 function getXML(path) {
@@ -69,39 +74,42 @@ function getXML(path) {
 const getCityDatas = getXML('./CityCountyData.json');
 const getStoreDatas = getXML('https://raw.githubusercontent.com/kiang/pharmacies/master/json/points.json?fbclid=IwAR0RC0E5_D-1vZVHJX_wvm7VUvdHYYcGw2Q0sSk4ppxu1zvqh7hAWN0oHdU');
 
-// 當所有資料獲取完畢後，整理資料。
+// 當所有資料獲取完畢後，渲染資料。
 Promise.all([getCityDatas, getStoreDatas]).then(resultDatas => {
   const cityDatas = resultDatas[0];
   const storeDatas = resultDatas[1].features;
+  // console.log(storeDatas);
 
-  // 建立搜尋選項（預設）。
+  // 取得使用者地理位置。
+  getUserPosition();
+  
+  // 取得今日時間與可以購買口罩者。
+  getToday();
+
+  // 建立搜尋選項（預設台北市）。
   createCityOption(cityDatas);
   createAreaOption(cityDatas, '台北市');
 
-  // 印出所有藥局口罩庫存資訊（預設）。
-  showAllStore(storeDatas);
+  // 顯示收藏的藥局 or 列出台北市地區的藥局
+  lovedStores.length ? getLovedStores(lovedStores, storeDatas) : findStore(storeDatas, '台北市', false);
 
   $.LoadingOverlay("hide");
 
   // 在地圖上繪製所有藥局資訊。
   drawAllStore(storeDatas);
 
-  // 取得今日時間與購買口罩者
-  getToday();
-
-
   document.getElementById('city').addEventListener('change', function() {
     const citySelected = document.getElementById('city').value;
     document.getElementById('searchValue').value = '';
     createAreaOption(cityDatas, citySelected);
-    findCityStore(storeDatas, citySelected);
+    findStore(storeDatas, citySelected, false);
   })
 
   document.getElementById('area').addEventListener('change', function() {
     const citySelected = document.getElementById('city').value;
     const areaSelected = document.getElementById('area').value;
     document.getElementById('searchValue').value = '';
-    findAreaStore(storeDatas, citySelected, areaSelected);
+    findStore(storeDatas, citySelected, areaSelected);
   })
 
   document.getElementById('searchBtn').addEventListener('click', function() {
@@ -117,7 +125,6 @@ Promise.all([getCityDatas, getStoreDatas]).then(resultDatas => {
     document.getElementById('store-list').innerHTML = str;
   })
 
-  // 監聽資訊面板開闔按鈕。
   document.getElementById('close-board-btn').addEventListener('click', function() {
     document.querySelector('.board').classList.add('hide');
   })
@@ -136,6 +143,23 @@ function getToday() {
   document.getElementById('date').innerHTML = todayStr;
 }
 
+// 取得使用者的地理位置。
+function getUserPosition() {
+  if(navigator.geolocation) {
+    function showPosition(position) {
+      L.marker([position.coords.latitude, position.coords.longitude], {icon: userPosIcon}).addTo(map);
+      map.setView([position.coords.latitude, position.coords.longitude], 16);
+    }
+    function showError() {
+      console.log('抱歉，現在無法取的您的地理位置。')
+    }
+
+    navigator.geolocation.getCurrentPosition(showPosition, showError);
+  } else {
+    console.log('抱歉，您的裝置不支援定位功能。');
+  }
+}
+
 // 產生城市搜尋欄位裡的選項。
 function createCityOption(cityDatas) {
   const citySelect = document.getElementById('city');
@@ -148,9 +172,9 @@ function createCityOption(cityDatas) {
     return arr.indexOf(item) === index;
   })
 
-  let cityOptionHTML = `<option value="" selected disabled>請選擇縣市</option>`;
+  let cityOptionHTML = ``;
   noRepeatCityArray.forEach(item => {
-    cityOptionHTML += `<option value="${item}">${item}</option>`;
+    cityOptionHTML += `<option value="${item}" ${item.CityName === '台北市' ? 'selected': ''}>${item}</option>`;
   })
   citySelect.innerHTML = cityOptionHTML;
 }
@@ -169,15 +193,19 @@ function createAreaOption(cityData, citySelected) {
 }
 
 // 產生藥局資訊的 HTML 樣板。
-function createHTML(store, html, count) {
+function createHTML(store, html, count, loved = false) {
   let [bgAdultColor, bgChildColor] = ['#bfffbf', '#bfffbf']; // 綠  
   if(store.properties.mask_adult <= 100) bgAdultColor = '#ffa470'; // 橙
   if(store.properties.mask_adult <= 30) bgAdultColor = '#ff9696'; // 紅
   if(store.properties.mask_child <= 100) bgChildColor = '#ffa470';
   if(store.properties.mask_child <= 30) bgChildColor = '#ff9696';
   html += `
-    <div class="store-info">
-      <h5 class="font-weight-bold mb-2">${store.properties.name}</h5>
+    <div class="store-info p-3" data-lat="${store.geometry.coordinates[1]}" data-lng="${store.geometry.coordinates[0]}">
+      <div class="d-flex justify-content-between">
+        <h5 class="font-weight-bold mb-2">${store.properties.name}</h5>
+        <div class="love ${loved ? 'hide' : ''}"><i class="far fa-heart"></i></div>
+        <div class="loved ${loved ? 'show' : ''}"><i class="fas fa-heart"></i></div>
+      </div>
       <p class="mb-1"><i class="fas fa-map-marker-alt"></i>  <a href="https://www.google.com.tw/maps/place/${store.properties.address}" target="_blank">${store.properties.address}</a></p>
       <p class="mb-2"><i class="fas fa-phone-alt"></i> ${store.properties.phone}</p>
       <div class="masks-info">
@@ -185,53 +213,87 @@ function createHTML(store, html, count) {
         <div class="mask-item" style="background-color: ${bgChildColor}">兒童口罩 <span>${store.properties.mask_child}</span> 個</div>
       </div>
     </div>
-    <hr>  
+    <hr class="m-0">  
   `;
   count += 1;
   return [html, count];
 }
 
-// 印出所有藥局資訊。
-function showAllStore(stores) {
+// 搜尋所選擇的藥局資訊。
+function findStore(stores, citySelected, areaSelected) {
   let str = ``;
   let storeCount = 0;
-  stores.forEach(store => {
-    [str, storeCount] = createHTML(store, str, storeCount);
-  })
-  document.getElementById('store-total').innerHTML = `全台總共有</u> ${storeCount} 家藥局。`;
-  document.getElementById('store-list').innerHTML = str;
-}
+  let matchedStore = [];
 
-// 搜尋所選擇城市裡的藥局資訊。
-function findCityStore(stores, citySelected) {
-  let str = ``;
-  let storeCount = 0;
-  stores.forEach(store => {
-    if(store.properties.address.includes(citySelected)) {
-      [str, storeCount] = createHTML(store, str, storeCount);
-    }
-  })
-  document.getElementById('store-total').innerHTML = `總共搜尋到 ${storeCount} 家藥局。`;
-  document.getElementById('store-list').innerHTML = str;
-}
-
-// 搜尋所選擇鄉鎮市區裡的藥局資訊。
-function findAreaStore(stores, citySelected, areaSelected) {
-  let str = ``;
-  let storeCount = 0;
-
-  if(areaSelected === 'all') {
-    findCityStore(stores, citySelected);
-    return
+  if(!areaSelected) {
+    matchedStore = stores.filter(store => store.properties.address.includes(citySelected));
+  } else if(areaSelected === 'all') {
+    findStore(stores, citySelected, false); return;
+  } else {
+    matchedStore = stores.filter(store => store.properties.address.includes(citySelected + areaSelected));
   }
 
-  stores.forEach(store => {
-    if(store.properties.address.includes(citySelected + areaSelected)) {
-      [str, storeCount] = createHTML(store, str, storeCount);
-    }
+  matchedStore = matchedStore.sort((a, b) => b.properties.mask_adult - a.properties.mask_adult);
+  matchedStore.forEach(store => {
+    [str, storeCount] = createHTML(store, str, storeCount);
   })
-  document.getElementById('store-total').innerHTML = `總共搜尋到 ${storeCount} 家藥局。`;
+  document.getElementById('store-total').innerHTML = `總共搜尋到 ${storeCount} 家藥局。${stores[0].properties.updated ? `（${stores[0].properties.updated.split(' ')[1]} 更新）` : ``} `;
   document.getElementById('store-list').innerHTML = str;
+  // 地圖自動定位至該縣市／鄉鎮市區。
+  if(areaSelected) map.setView([matchedStore[0].geometry.coordinates[1], matchedStore[0].geometry.coordinates[0]], 13);
+
+  // 點選資訊卡片會將地圖自動定位至該位置。
+  const storeInfoEl = document.querySelectorAll('.store-info');
+  storeInfoEl.forEach(storeEl => {
+    storeEl.addEventListener('click', function() {
+      map.setView([storeEl.dataset.lat, storeEl.dataset.lng], 18);
+    })
+  })
+  loveBtn();
+}
+
+// 顯示收藏的藥局清單。
+function getLovedStores(list, storeDatas) {
+  let str = ``;
+  let storeCount = 0;
+  let lovedStores = [];
+  list.forEach(item => {
+    const matchedStore = storeDatas.find(store => store.properties.phone.includes(item.trim()));
+    lovedStores.push(matchedStore);
+    console.log(matchedStore);
+  })
+  lovedStores = lovedStores.sort((a, b) => b.properties.mask_adult - a.properties.mask_adult);
+  lovedStores.forEach(store => {
+    [str, storeCount] = createHTML(store, str, storeCount, true);
+  })
+  document.getElementById('store-total').innerHTML = `您收藏了</u> ${storeCount} 家藥局。`;
+  document.getElementById('store-list').innerHTML = str;
+
+  loveBtn();
+}
+
+// 點愛心可以加入我的最愛。
+function loveBtn() {
+  const lovesEl = document.querySelectorAll('.store-info .love');
+  lovesEl.forEach(loveEl => {
+    const loveElTel = loveEl.parentNode.parentNode.children[2].textContent;
+
+    loveEl.addEventListener('click', function() {
+      lovedStores.push(loveElTel);
+      loveEl.classList.toggle('hide');
+      loveEl.parentNode.children[2].classList.toggle('show');
+      // console.log(lovedStores);
+      localStorage.setItem('lovedStores', JSON.stringify(lovedStores)) ;
+    })
+
+    loveEl.parentNode.children[2].addEventListener('click', function() {
+      removeByValue(lovedStores, loveElTel);
+      loveEl.classList.toggle('hide');
+      loveEl.parentNode.children[2].classList.toggle('show');
+      // console.log(lovedStores);
+      localStorage.setItem('lovedStores', JSON.stringify(lovedStores)) ;
+    })
+  })
 }
 
 // 標出每家藥局的位置和口罩庫存。
@@ -256,9 +318,9 @@ function drawAllStore(datas) {
     <p>電話： ${store.properties.phone}</p>
     <p class="font-weight-bold"><span>成人：  ${store.properties.mask_adult} 個</span>／兒童：${store.properties.mask_child} 個</p>
     `);
-
     storeCluster.addLayer(storeLocation);
   })
+  
   map.addLayer(storeCluster);
 }
 
