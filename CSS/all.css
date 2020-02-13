@@ -56,6 +56,30 @@ body {
   outline: none;
 }
 
+#legend {
+  position: absolute;
+  bottom: 2%;
+  left: 28%;
+  z-index: 3;
+  padding: 10px;
+  color: #333;
+  background-color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+          box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  list-style: none;
+}
+
+@media (max-width: 575.98px) {
+  #legend {
+    left: 1%;
+    bottom: 2.5%;
+  }
+}
+
 #store-list {
   overflow-y: scroll;
   background-color: rgba(255, 255, 255, 0.7);
@@ -181,14 +205,15 @@ body {
 
 #open-board-btn {
   position: absolute;
-  top: 45%;
-  left: 100%;
+  top: 3%;
+  left: 103%;
   z-index: 10;
-  padding: 2px 8px 2px 5px;
-  border-radius: 0px 2px 2px 0px;
+  padding: 0px 8px;
   background-color: #fff;
-  -webkit-box-shadow: 10px 0px 10px rgba(0, 0, 0, 0.2);
-          box-shadow: 10px 0px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+          box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
   color: #333;
   font-size: 24px;
   cursor: pointer;

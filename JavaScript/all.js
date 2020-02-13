@@ -3,25 +3,48 @@ $.LoadingOverlay("show",{
   background  : "rgba(0, 0, 0, 0.5)"
 });
 
-// 建立 Leaflet 地圖，並設定中心經緯度座標（台北市），縮放程度為 10。
-const map = L.map('map', {
-  center: [25.040065, 121.523235],
-  zoom: 10,
-  zoomControl: false
-})
+// 獲取收藏的藥局清單。
+const lovedStores = JSON.parse(localStorage.getItem('lovedStores')) || [];
+let map ; let storeCluster ;
+const greenIcon = createIcon('flag-green');
+const orangeIcon = createIcon('flag-orange');
+const redIcon = createIcon('flag-red');
+const userPosIcon = createIcon('user');
 
-// 設定地圖資料來源（OpenStreetMap）。
-const osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-L.tileLayer(osmUrl, {
-  attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> | 資料來源：<a href="https://data.nhi.gov.tw/Datasets/DatasetResource.aspx?rId=A21030000I-D50001-001&fbclid=IwAR11LdkhQPr1nyASKg0bUCx6LnIGY7KECOeVQ2EHwc67f2iKocIMuXRIpFE">衛生福利部中央健康保險署</a> | Created by <a href="https://www.facebook.com/luffychen0715?ref=bookmarks" target="_blank">Luffy</a>',
-  minZoom: 8,
-  maxZoom: 18
-}).addTo(map);
+const getCityDatas = getXML('./CityCountyData.json');
+const getStoreDatas = getXML('https://raw.githubusercontent.com/kiang/pharmacies/master/json/points.json?fbclid=IwAR0RC0E5_D-1vZVHJX_wvm7VUvdHYYcGw2Q0sSk4ppxu1zvqh7hAWN0oHdU');
 
-// 自訂縮放按鈕位置。
-L.control.zoom({
-  position: 'topright'
-}).addTo(map);
+function drawMap() {
+  // 建立 Leaflet 地圖，並設定中心經緯度座標（台北市），縮放程度為 10。
+  map = L.map('map', {
+    center: [25.040065, 121.523235],
+    zoom: 10,
+    zoomControl: false
+  })
+  
+  // 設定地圖資料來源（OpenStreetMap）。
+  const osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  L.tileLayer(osmUrl, {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> | 資料來源：<a href="https://data.nhi.gov.tw/Datasets/DatasetResource.aspx?rId=A21030000I-D50001-001&fbclid=IwAR11LdkhQPr1nyASKg0bUCx6LnIGY7KECOeVQ2EHwc67f2iKocIMuXRIpFE">衛生福利部中央健康保險署</a> | Created by <a href="https://www.facebook.com/luffychen0715?ref=bookmarks" target="_blank">Fei</a>',
+    minZoom: 8,
+    maxZoom: 18
+  }).addTo(map);
+  
+  // 自訂縮放按鈕位置。
+  L.control.zoom({
+    position: 'topright'
+  }).addTo(map);
+
+  // 區域藥局群集。
+  storeCluster = new L.MarkerClusterGroup({
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true,
+    iconCreateFunction: function(cluster) {
+      return L.divIcon({ html: `<div class="store-cluster">${cluster.getChildCount()}</div>` });
+    }
+  }).addTo(map);
+}
 
 // 自訂藥局座標 Icon。
 function createIcon(name) {
@@ -34,24 +57,6 @@ function createIcon(name) {
     shadowSize: [41, 41]
   });
 }
-
-const greenIcon = createIcon('flag-green');
-const orangeIcon = createIcon('flag-orange');
-const redIcon = createIcon('flag-red');
-const userPosIcon = createIcon('user');
-
-// 區域藥局群集。
-const storeCluster = new L.MarkerClusterGroup({
-	spiderfyOnMaxZoom: true,
-	showCoverageOnHover: false,
-  zoomToBoundsOnClick: true,
-  iconCreateFunction: function(cluster) {
-		return L.divIcon({ html: `<div class="store-cluster">${cluster.getChildCount()}</div>` });
-	}
-}).addTo(map);
-
-// 獲取收藏的藥局清單。
-const lovedStores = JSON.parse(localStorage.getItem('lovedStores')) || [];
 
 // 串接 API，（非同步）獲取遠端 API 或本地 JSON 資料（封裝成一個 function）。
 function getXML(path) {
@@ -71,36 +76,26 @@ function getXML(path) {
   })
 }
 
-const getCityDatas = getXML('./CityCountyData.json');
-const getStoreDatas = getXML('https://raw.githubusercontent.com/kiang/pharmacies/master/json/points.json?fbclid=IwAR0RC0E5_D-1vZVHJX_wvm7VUvdHYYcGw2Q0sSk4ppxu1zvqh7hAWN0oHdU');
-
 // 當所有資料獲取完畢後，渲染資料。
 Promise.all([getCityDatas, getStoreDatas]).then(resultDatas => {
   const cityDatas = resultDatas[0];
   const storeDatas = resultDatas[1].features;
   // console.log(storeDatas);
 
-  // 取得使用者地理位置。
+  drawMap();
   getUserPosition();
-  
-  // 取得今日時間與可以購買口罩者。
   getToday();
-
-  // 建立搜尋選項（預設台北市）。
   createCityOption(cityDatas);
   createAreaOption(cityDatas, '台北市');
-
-  // 顯示收藏的藥局 or 列出台北市地區的藥局
   lovedStores.length ? getLovedStores(lovedStores, storeDatas) : findStore(storeDatas, '台北市', false);
-
+  
   $.LoadingOverlay("hide");
-
-  // 在地圖上繪製所有藥局資訊。
+  
   drawAllStore(storeDatas);
 
   document.getElementById('city').addEventListener('change', function() {
     const citySelected = document.getElementById('city').value;
-    document.getElementById('searchValue').value = '';
+    document.getElementById('search-value').value = '';
     createAreaOption(cityDatas, citySelected);
     findStore(storeDatas, citySelected, false);
   })
@@ -108,12 +103,12 @@ Promise.all([getCityDatas, getStoreDatas]).then(resultDatas => {
   document.getElementById('area').addEventListener('change', function() {
     const citySelected = document.getElementById('city').value;
     const areaSelected = document.getElementById('area').value;
-    document.getElementById('searchValue').value = '';
+    document.getElementById('search-value').value = '';
     findStore(storeDatas, citySelected, areaSelected);
   })
 
-  document.getElementById('searchBtn').addEventListener('click', function() {
-    const searchValue = document.getElementById('searchValue').value;
+  document.getElementById('search-btn').addEventListener('click', function() {
+    const searchValue = document.getElementById('search-value').value;
     let str = ``;
     let storeCount = 0;
     storeDatas.filter(store => {
@@ -123,6 +118,10 @@ Promise.all([getCityDatas, getStoreDatas]).then(resultDatas => {
     })
     document.getElementById('store-total').innerHTML = `總共找到</u> ${storeCount} 家相符的藥局。`;
     document.getElementById('store-list').innerHTML = str;
+  })
+
+  document.getElementById('loved-btn').addEventListener('click', function(){
+    lovedStores.length ? getLovedStores(lovedStores, storeDatas) : findStore(storeDatas, '台北市', false);
   })
 
   document.getElementById('close-board-btn').addEventListener('click', function() {
@@ -240,7 +239,7 @@ function findStore(stores, citySelected, areaSelected) {
   document.getElementById('store-total').innerHTML = `總共搜尋到 ${storeCount} 家藥局。${stores[0].properties.updated ? `（${stores[0].properties.updated.split(' ')[1]} 更新）` : ``} `;
   document.getElementById('store-list').innerHTML = str;
   // 地圖自動定位至該縣市／鄉鎮市區。
-  if(areaSelected) map.setView([matchedStore[0].geometry.coordinates[1], matchedStore[0].geometry.coordinates[0]], 13);
+  if(areaSelected) map.setView([matchedStore[0].geometry.coordinates[1], matchedStore[0].geometry.coordinates[0]], 14);
 
   // 點選資訊卡片會將地圖自動定位至該位置。
   const storeInfoEl = document.querySelectorAll('.store-info');
@@ -249,7 +248,7 @@ function findStore(stores, citySelected, areaSelected) {
       map.setView([storeEl.dataset.lat, storeEl.dataset.lng], 18);
     })
   })
-  loveBtn();
+  loveBtnActive();
 }
 
 // 顯示收藏的藥局清單。
@@ -260,7 +259,6 @@ function getLovedStores(list, storeDatas) {
   list.forEach(item => {
     const matchedStore = storeDatas.find(store => store.properties.phone.includes(item.trim()));
     lovedStores.push(matchedStore);
-    console.log(matchedStore);
   })
   lovedStores = lovedStores.sort((a, b) => b.properties.mask_adult - a.properties.mask_adult);
   lovedStores.forEach(store => {
@@ -269,28 +267,30 @@ function getLovedStores(list, storeDatas) {
   document.getElementById('store-total').innerHTML = `您收藏了</u> ${storeCount} 家藥局。`;
   document.getElementById('store-list').innerHTML = str;
 
-  loveBtn();
+  loveBtnActive();
 }
 
 // 點愛心可以加入我的最愛。
-function loveBtn() {
-  const lovesEl = document.querySelectorAll('.store-info .love');
-  lovesEl.forEach(loveEl => {
-    const loveElTel = loveEl.parentNode.parentNode.children[2].textContent;
+function loveBtnActive() {
+  const love = document.querySelectorAll('.store-info .love');
+  const loved = document.querySelectorAll('.store-info .loved');
 
-    loveEl.addEventListener('click', function() {
-      lovedStores.push(loveElTel);
-      loveEl.classList.toggle('hide');
-      loveEl.parentNode.children[2].classList.toggle('show');
-      // console.log(lovedStores);
+  love.forEach(el => {
+    const lovedStoreTel = el.parentNode.parentNode.children[2].textContent;
+    el.addEventListener('click', function() {
+      lovedStores.push(lovedStoreTel);
+      el.classList.toggle('hide');
+      el.parentNode.children[2].classList.toggle('show');
       localStorage.setItem('lovedStores', JSON.stringify(lovedStores)) ;
     })
+  })
 
-    loveEl.parentNode.children[2].addEventListener('click', function() {
-      removeByValue(lovedStores, loveElTel);
-      loveEl.classList.toggle('hide');
-      loveEl.parentNode.children[2].classList.toggle('show');
-      // console.log(lovedStores);
+  loved.forEach(el => {
+    const lovedStoreTel = el.parentNode.parentNode.children[2].textContent;
+    el.addEventListener('click', function() {
+      removeByValue(lovedStores, lovedStoreTel);
+      el.classList.toggle('show');
+      el.parentNode.children[1].classList.toggle('hide');
       localStorage.setItem('lovedStores', JSON.stringify(lovedStores)) ;
     })
   })

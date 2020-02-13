@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>全台各地藥局口罩存貨實時地圖</title>
+  <title>口罩存貨實時地圖</title>
 
   <!-- Basic Meta Tags -->
   <meta name="author" content="Fei">
   <meta name="description" content="請問還有口罩嗎？">
-  <meta name="keywords" content="台灣, 口罩, 藥局, 存貨, 武漢肺炎, 冠狀病毒">
+  <meta name="keywords" content="台灣, 口罩, 藥局, 存貨, 武漢肺炎, 2019新冠狀病毒">
 
   <!-- Facebook -->
   <meta property="og:title" content="全台口罩存貨實時地圖">
@@ -17,8 +17,8 @@
   <meta property="og:locale" content="zh_tw">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://feitoengineer19.github.io/mask-map/">
-  <meta property="og:image" content="https://i.imgur.com/ZlnbWmL.jpg">
-  <meta property="og:site_name" content="全台各地藥局口罩存貨實時地圖" />
+  <meta property="og:image" content="https://i.imgur.com/X5YjB7G.jpg">
+  <meta property="og:site_name" content="口罩存貨實時地圖" />
     
   <!-- Favicon -->
   <link rel="icon" href="./Assets/mask.png">
@@ -57,17 +57,36 @@
           </select>
         </div>
       </div>
-      <div class="input-group input-group-sm px-3">
-        <input type="text" id="searchValue" class="form-control" placeholder="透過地址或名稱搜尋" aria-label="透過地址或名稱搜尋" aria-describedby="searchBtn">
-        <div class="input-group-append">
-          <button class="btn btn-primary" type="button" id="searchBtn">搜尋</button>
+      <div class="form-row px-3">
+        <div class="col">
+          <div class="input-group input-group-sm">
+            <input type="text" id="search-value" class="form-control" placeholder="透過地址或名稱搜尋" aria-label="透過地址或名稱搜尋" aria-describedby="search-btn">
+            <div class="input-group-append">
+              <button class="btn btn-primary" type="button" id="search-btn">搜尋</button>
+            </div>
+          </div>        
+        </div>
+        <div class="col-auto">
+          <button id="loved-btn" class="btn btn-sm btn-outline-danger mb-2">我的收藏</button>
         </div>
       </div>
+
       <div id="store-total" class="px-3 mt-2">載入中...</div>
     </div>
     <div id="store-list"></div>
-    <div id="open-board-btn" class="d-block d-sm-none"><i class="fas fa-caret-left"></i></div>
+    <div id="open-board-btn" class="d-block d-sm-none"><i class="fas fa-bars"></i></div>
   </aside>
+  <ul id="legend">
+    <li>
+      <img src="./Assets/flag-green.png" alt="" class="img-fluid" width="28"> 存貨 > 100
+    </li>
+    <li>
+      <img src="./Assets/flag-orange.png" alt="" class="img-fluid" width="28"> 存貨 <= 100
+    </li>
+    <li>
+      <img src="./Assets/flag-red.png" alt="" class="img-fluid" width="28"> 存貨 < 30
+    </li>
+  </ul>
   <main id="map"></main>
 
   <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
