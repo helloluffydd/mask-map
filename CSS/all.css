@@ -63,7 +63,7 @@ body {
   z-index: 3;
   padding: 10px;
   color: #333;
-  background-color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
           box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
@@ -76,7 +76,8 @@ body {
 @media (max-width: 575.98px) {
   #legend {
     left: 1%;
-    bottom: 2.5%;
+    bottom: 3%;
+    opacity: 0;
   }
 }
 

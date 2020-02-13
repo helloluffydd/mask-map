@@ -62,7 +62,7 @@ body {
   z-index: 3;
   padding: 10px;
   color: #333;
-  background-color: rgba(#fff, 0.6);
+  background-color: rgba(#fff, 0.7);
   border: 1px solid rgba(#000, 0.5);
   box-shadow: 0px 0px 5px rgba(#000, 0.2);
   border-radius: 5px;
@@ -72,7 +72,8 @@ body {
   
   @media (max-width: 575.98px) { 
     left: 1%;
-    bottom: 2.5%;
+    bottom: 3%;
+    opacity: 0;
   }
 }
 

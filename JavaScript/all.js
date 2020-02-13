@@ -126,10 +126,12 @@ Promise.all([getCityDatas, getStoreDatas]).then(resultDatas => {
 
   document.getElementById('close-board-btn').addEventListener('click', function() {
     document.querySelector('.board').classList.add('hide');
+    document.getElementById('legend').style.opacity = 1;
   })
 
   document.getElementById('open-board-btn').addEventListener('click', function() {
     document.querySelector('.board').classList.remove('hide');
+    document.getElementById('legend').style.opacity = 0;
   })
 })
 
