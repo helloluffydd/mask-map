@@ -80,7 +80,7 @@ function getXML(path) {
 Promise.all([getCityDatas, getStoreDatas]).then(resultDatas => {
   const cityDatas = resultDatas[0];
   const storeDatas = resultDatas[1].features;
-  // console.log(storeDatas);
+  console.log(storeDatas);
 
   drawMap();
   getUserPosition();
@@ -162,7 +162,7 @@ function getUserPosition() {
 }
 
 // 產生城市搜尋欄位裡的選項。
-function createCityOption(cityDatas) {
+function createCityOption(cityDatas) {  
   const citySelect = document.getElementById('city');
   const cityArray = cityDatas.map(item => item.CityName.replace(/臺/g,'台'));
   removeByValue(cityArray, '南海島');
