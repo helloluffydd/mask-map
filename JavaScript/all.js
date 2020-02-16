@@ -80,7 +80,7 @@ function getXML(path) {
 Promise.all([getCityDatas, getStoreDatas]).then(resultDatas => {
   const cityDatas = resultDatas[0];
   const storeDatas = resultDatas[1].features;
-  console.log(storeDatas);
+  // console.log(storeDatas);
 
   drawMap();
   getUserPosition();
